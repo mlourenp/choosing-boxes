@@ -27,7 +27,13 @@ def get_bqm(S):
     bqm = BinaryQuadraticModel('BINARY')
 
     # Add BQM construction here
-    
+    variables = ['box_17', 'box_21', 'box_19']
+
+    for i in range(len(S)):
+        bqm.add_variable(variables[i], S[i])
+
+    bqm.add_linear_equality_constraint([(variables[i],1) for i in range(len(S))], lagrange_multiplier= 20, constant= -2)
+
     return bqm
 
 # TODO:  Choose QPU parameters in the following function
@@ -40,7 +46,7 @@ def run_on_qpu(bqm, sampler):
         sampler (dimod.Sampler): a sampler that uses the QPU
     """
 
-    numruns = 1 # update
+    numruns = 100 # update
 
     sample_set = sampler.sample(bqm, num_reads=numruns, label='Training - Choosing Boxes')
 
@@ -54,7 +60,10 @@ if __name__ == "__main__":
     bqm = get_bqm(S)
 
     #TODO:  Write code to define your sampler
+    sampler = EmbeddingComposite(DWaveSampler())
 
     #TODO:  Write code to run your problem
+    sampleset = run_on_qpu(bqm, sampler)
 
     #TODO:  Write code to look at the solutions returned
+    print(sampleset)
